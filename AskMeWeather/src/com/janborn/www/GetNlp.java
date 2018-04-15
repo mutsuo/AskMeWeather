@@ -17,15 +17,21 @@ public class GetNlp {
     public static final String API_KEY = "G1SCbCcrXpwiut6lR1fK92xT";
     public static final String SECRET_KEY = "8IETLzLCZa0hr4weHBmAeuk1GGR20bz4";
     
-    private String i_text;
+    private String text;
+//    private String jsonUrl;
+    private JSONObject jsonObject; 
     
-	public GetNlp(String text) {
-		i_text=text;
+	public void setText(String text) {
+		this.text=text;
 	}
-	
-	public JSONObject getNlp() {
-        JSONObject temp = new JSONObject();
-        return temp;
+	public void toJSON() {
+		
+	}
+//	public void setJsonObject(JSONObject jsonObject) {
+//		this.jsonObject = jsonObject;
+//	}
+
+	public GetNlp() {
 	}
 
 }
