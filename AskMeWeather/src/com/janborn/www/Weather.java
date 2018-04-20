@@ -3,25 +3,32 @@
 * FileName: Weather.java
 * 返回需要的天气数据
 *
-* @author ??
-    * @Date    ????-??-??
+* @author Liu Hengren
+    * @Date    2018-04-19
 * @version 1.00
 */
 package com.janborn.www;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+
 
 public class Weather extends GetWeather {
 	private JSONObject weather;
+	public Location location2=new Location();
+	public LifeSuggestion lifeSuggestion=new LifeSuggestion();
+	public Daily  daily=new Daily();
+	public Now now=new Now();
 	public class Location {
 		private String id;
 		private String name;
 		private String country;
 		private String timezone;
 		private String timezone_offset;
-
 		public Location() {
 			id = "";
 			name = "";
@@ -80,7 +87,6 @@ public class Weather extends GetWeather {
 	}
 
 	public class Now {
-		private Location location;
 		private String text;
 		private String code;
 		private String temperature;
@@ -92,9 +98,6 @@ public class Weather extends GetWeather {
 			temperature = "";
 		}
 
-		public Location getLocation() {
-			return location;
-		}
 
 		public String getText() {
 			return text;
@@ -112,9 +115,6 @@ public class Weather extends GetWeather {
 			return last_update;
 		}
 
-		public void setLocation(Location location) {
-			this.location = location;
-		}
 
 		public void setText(String text) {
 			this.text = text;
@@ -147,7 +147,6 @@ public class Weather extends GetWeather {
 		private String wind_direction_degree;
 		private String wind_speed;
 		private String wind_scale;
-
 		public DailyContent() {
 			date = "";
 			text_day = "";
@@ -262,22 +261,15 @@ public class Weather extends GetWeather {
 	}
 
 	public class Daily {
-		private Location location;
-		private List<DailyContent> daily;
+		private List<DailyContent> daily=new ArrayList<>();
 		private String last_update;
 		public Daily(){
-		}
-		public Location getLocation() {
-			return location;
 		}
 		public List<DailyContent> getDaily() {
 			return daily;
 		}
 		public String getLast_update() {
 			return last_update;
-		}
-		public void setLocation(Location location) {
-			this.location = location;
 		}
 		public void setDaily(List<DailyContent> daily) {
 			this.daily = daily;
@@ -287,20 +279,135 @@ public class Weather extends GetWeather {
 		}
 		
 	}
+	public  class LifeSuggestion{
+		private String dressing;
+		private String flu;
+		private String sport;
+		private String travel;
+		private String uv;
+		private String car_washing;
+		private String last_update;
+		public String getCar_washing() {
+			return car_washing;
+		}
+		public void setCar_washing(String car_washing) {
+			this.car_washing = car_washing;
+		}
+		public String getDressing() {
+			return dressing;
+		}
+		public void setDressing(String dressing) {
+			this.dressing = dressing;
+		}
+		public String getLast_update() {
+			return last_update;
+		}
+		public void setLast_update(String last_update) {
+			this.last_update = last_update;
+		}
+		public String getFlu() {
+			return flu;
+		}
+		public void setFlu(String flu) {
+			this.flu = flu;
+		}
+		public String getSport() {
+			return sport;
+		}
+		public void setSport(String sport) {
+			this.sport = sport;
+		}
+		public String getTravel() {
+			return travel;
+		}
+		public void setTravel(String travel) {
+			this.travel = travel;
+		}
+		public String getUv() {
+			return uv;
+		}
+		public void setUv(String uv) {
+			this.uv = uv;
+		}
+		
+	}
 
+	//用于获取即时天气
 	public Weather(String location, String language, String unit) {
 		super(location, language, unit);
+		Now now = this.new Now();
+		weather=new JSONObject(this.getJsonString());
+		JSONArray jsonWeatherArr=weather.getJSONArray("results");
+		setLocation();
+		JSONObject jsonNow=jsonWeatherArr.getJSONObject(0).getJSONObject("now");
+		JSONObject jsonlast_update=jsonWeatherArr.getJSONObject(0);
+		this.now.setCode(jsonNow.getString("code"));
+		this.now.setText(jsonNow.getString("text"));
+		this.now.setTemperature(jsonNow.getString("temperature"));
+		this.now.setLast_update(jsonlast_update.getString("last_update"));
 		// TODO Auto-generated constructor stub
 	}
-
+	//用于获取逐日天气（3天）
 	public Weather(String location, String language, String unit, String start, String end) {
 		super(location, language, unit, start, end);
+		weather=new JSONObject(this.getJsonString());
+		JSONArray jsonWeatherArr=weather.getJSONArray("results");
+		setLocation();
+		JSONObject jsonlast_update=jsonWeatherArr.getJSONObject(0);
+		this.daily.setLast_update(jsonlast_update.getString("last_update"));
+		JSONArray jsonDailyArr=jsonWeatherArr.getJSONObject(0).getJSONArray("daily");
+		//System.out.println(jsonDailyArr.length());		//测试用代码
+		for (int i=0;i<jsonDailyArr.length();i++)
+		{
+			DailyContent dailyContent = this.new DailyContent();
+			dailyContent.setDate(jsonDailyArr.getJSONObject(i).getString("date"));
+			dailyContent.setText_day(jsonDailyArr.getJSONObject(i).getString("text_day"));
+			dailyContent.setCode_day(jsonDailyArr.getJSONObject(i).getString("code_day"));
+			dailyContent.setText_night(jsonDailyArr.getJSONObject(i).getString("text_night"));
+			dailyContent.setCode_night(jsonDailyArr.getJSONObject(i).getString("code_night"));
+			dailyContent.setHigh(jsonDailyArr.getJSONObject(i).getString("high"));
+			dailyContent.setLow(jsonDailyArr.getJSONObject(i).getString("low"));
+			dailyContent.setPrecip(jsonDailyArr.getJSONObject(i).getString("precip"));
+			dailyContent.setWind_direction(jsonDailyArr.getJSONObject(i).getString("weind_direction"));
+			dailyContent.setWind_direction_degree(jsonDailyArr.getJSONObject(i).getString("wind_direction_degree"));
+			dailyContent.setWind_speed(jsonDailyArr.getJSONObject(i).getString("wind_speed"));
+			dailyContent.setWind_scale(jsonDailyArr.getJSONObject(i).getString("wind_scale"));
+			this.daily.daily.add(dailyContent);
+			
+		}
+		
 		// TODO Auto-generated constructor stub
 	}
-
+	//用于获取生活信息
 	public Weather(String location, String language) {
 		super(location, language);
+		weather=new JSONObject(this.getJsonString());
+		JSONArray jsonWeatherArr=weather.getJSONArray("results");
+		setLocation();
+		JSONObject jsonSuggestion=jsonWeatherArr.getJSONObject(0).getJSONObject("suggestion");
+		JSONObject jsonCar_washing=jsonSuggestion.getJSONObject("car_washing");
+		JSONObject jsonDressing=jsonSuggestion.getJSONObject("dressing");
+		JSONObject jsonFlu=jsonSuggestion.getJSONObject("flu");
+		JSONObject jsonSport=jsonSuggestion.getJSONObject("sprot");
+		JSONObject jsonTravel=jsonSuggestion.getJSONObject("travel");
+		JSONObject jsonUv=jsonSuggestion.getJSONObject("uv");
+		this.lifeSuggestion.setDressing(jsonDressing.getString("brief"));
+		this.lifeSuggestion.setFlu(jsonFlu.getString("brief"));
+		this.lifeSuggestion.setSport(jsonSport.getString("brief"));
+		this.lifeSuggestion.setTravel(jsonTravel.getString("brief"));
+		this.lifeSuggestion.setUv(jsonUv.getString("brief"));
+		this.lifeSuggestion.setCar_washing(jsonCar_washing.getString("brief"));
 		// TODO Auto-generated constructor stub
+	}
+	//用于设置Location
+	public void setLocation() {
+		JSONArray jsonWeatherArr=weather.getJSONArray("results");
+		JSONObject jsonlocation=jsonWeatherArr.getJSONObject(0).getJSONObject("location");
+		this.location2.setCountry(jsonlocation.getString("country"));
+		this.location2.setId(jsonlocation.getString("id"));
+		this.location2.setName(jsonlocation.getString("name"));
+		this.location2.setTimezone(jsonlocation.getString("timezone"));
+		this.location2.setTimezone_offset(jsonlocation.getString("timezone_offset"));
 	}
 
 }
