@@ -3,8 +3,8 @@
 * FileName: GetWeather.java
 * 根据需求查询天气数据
 *
-* @author ??
-    * @Date    ????-??-??
+* @author Liu Hengren
+    * @Date    2018-04-17
 * @version 1.00
 */
 
@@ -15,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.SignatureException;
 import java.util.Date;
 import java.net.URLEncoder;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class GetWeather {
@@ -52,7 +53,15 @@ public class GetWeather {
 	 * @return none
 	 */
 	public GetWeather(String location, String language, String unit) {
-
+		this.i_location=location;
+		this.i_language=language;
+		this.i_unit=unit;
+		try {
+			generateGetNowWeatherURL();
+		} catch (SignatureException | UnsupportedEncodingException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -66,7 +75,17 @@ public class GetWeather {
 	 * @return none
 	 */
 	public GetWeather(String location, String language, String unit, String start, String end) {
-
+		this.i_location=location;
+		this.i_language=language;
+		this.i_unit=unit;
+		this.i_start=start;
+		this.i_end=end;
+		try {
+			generateGetDiaryWeatherURL();
+		} catch (SignatureException | UnsupportedEncodingException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -77,7 +96,14 @@ public class GetWeather {
 	 * @return none
 	 */
 	public GetWeather(String location, String language) {
-
+		this.i_location=location;
+		this.i_language=language;
+		try {
+			getLifeSuggestionURL();
+		} catch (SignatureException | UnsupportedEncodingException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -113,9 +139,24 @@ public class GetWeather {
 	 * @param unit
 	 * @return none
 	 */
-	public void generateGetNowWeatherURL() {
-		String temp = new String();
-		setJsonString(temp);
+	
+	
+	//问题：中文URL问题
+	public void generateGetNowWeatherURL() throws SignatureException, UnsupportedEncodingException{
+		String timestamp = String.valueOf(new Date().getTime());
+		String params = "ts=" + timestamp + "&ttl=30&uid=" + TIANQI_API_USER_ID;
+        String signature = URLEncoder.encode(generateSignature(params, TIANQI_API_SECRET_KEY), "UTF-8");
+        this.jsonUrl=TIANQI_NOW_WEATHER_URL + "?" + params + "&sig=" + signature + "&location=" + URLEncoder.encode( this.i_location,"utf-8" ) + "&language=" + this.i_language + "&unit=" + this.i_unit ;
+        String temp = new String();
+        GetURL getURL = new GetURL(this.jsonUrl);
+        try {
+			temp=getURL.getUrl();
+		} catch (IOException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
+		this.setJsonString(temp);
+		
 	}
 
 	/**
@@ -128,9 +169,20 @@ public class GetWeather {
 	 * @param end
 	 * @return none
 	 */
-	public void generateGetDiaryWeatherURL() {
-		String temp = new String();
-		setJsonString(temp);
+	public void generateGetDiaryWeatherURL()throws SignatureException, UnsupportedEncodingException {
+		String timestamp = String.valueOf(new Date().getTime());
+		String params = "ts=" + timestamp + "&ttl=30&uid=" + TIANQI_API_USER_ID;
+        String signature = URLEncoder.encode(generateSignature(params, TIANQI_API_SECRET_KEY), "UTF-8");
+        this.jsonUrl=TIANQI_DAILY_WEATHER_URL + "?" + params + "&sig=" + signature + "&location=" + URLEncoder.encode( this.i_location,"utf-8" ) + "&language=" + this.i_language + "&unit=" + this.i_unit + "&start=" + this.i_start + "&days=" + this.i_end;
+        String temp = new String();
+        GetURL getURL = new GetURL(this.jsonUrl);
+        try {
+			temp=getURL.getUrl();
+		} catch (IOException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
+		this.setJsonString(temp);
 	}
 
 	/**
@@ -140,9 +192,20 @@ public class GetWeather {
 	 * @param language
 	 * @return none
 	 */
-	public void getLifeSuggestionURL() {
-		String temp = new String();
-		setJsonString(temp);
+	public void getLifeSuggestionURL() throws SignatureException, UnsupportedEncodingException{
+		String timestamp = String.valueOf(new Date().getTime());
+		String params = "ts=" + timestamp + "&ttl=30&uid=" + TIANQI_API_USER_ID;
+        String signature = URLEncoder.encode(generateSignature(params, TIANQI_API_SECRET_KEY), "UTF-8");
+        this.jsonUrl=TIANQI_LIFE_SUGGESTRION_URL + "?" + params + "&sig=" + signature + "&location=" + URLEncoder.encode( this.i_location,"utf-8" ) + "&language=" + this.i_language;
+        String temp = new String();
+        GetURL getURL = new GetURL(this.jsonUrl);
+        try {
+			temp=getURL.getUrl();
+		} catch (IOException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
+		this.setJsonString(temp);
 	}
 
 }
