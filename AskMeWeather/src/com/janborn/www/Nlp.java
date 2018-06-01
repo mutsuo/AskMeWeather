@@ -11,12 +11,20 @@
 package com.janborn.www;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.ErrorManager;
+
+import org.json.JSONObject;
+
+import com.janborn.www.Nlp.aipNoConnectionException;
+import com.janborn.www.Weather.EerrorMessage;
 
 public class Nlp extends GetNlp {
 	/* text保存接收到的文本 */
 	private String text;
 	/* i_item是数组名，用来保存成员内部类Items的所有信息 */
-	private ArrayList<Items> i_item = new ArrayList<>();
+	private List<Items> i_item = new ArrayList<>();
 
 	/**
 	 * Team Zhinengxianfeng Hebei Normal University FileName: Nlp.java
@@ -198,14 +206,40 @@ public class Nlp extends GetNlp {
 	 * 有参构造函数：设置文本内容text和把通过父类得到GetJSON格式为i_item数组赋值
 	 *
 	 * @param 一个参数:参数t接收传进来的字符串内容，把它赋值给text
+	 * @throws aipNoConnectionException 
 	 */
-	public Nlp(String t) {
+	public Nlp(String t) throws aipNoConnectionException {
 		super(t);
 		// TODO Auto-generated constructor stub
-		text = t;
-		for (int i = 0; i < GetJSON().getJSONArray("items").length(); i++) {
-			i_item.add(new Items(i));
+		if(super.GetJSON()==null) throw new aipNoConnectionException();
+		else {
+			text = t;
+			JSONObject jsonObject2 = Nlp.this.GetJSON();
+			Iterator<String> keys = jsonObject2.keys();
+			String key =keys.next().toString();
+			for(;keys.hasNext();)
+				key=keys.next();
+			if(key.equals("items")) {
+				for (int i = 0; i < GetJSON().getJSONArray("items").length(); i++) {
+					i_item.add(new Items(i));
+				}
+			}
+			else {
+				throw new aipNoConnectionException();
+			}
 		}
+	}
+	
+	public class aipNoConnectionException extends Exception
+	{
+	  public aipNoConnectionException()
+	  {
+
+	  }
+	  public aipNoConnectionException(String s)
+	  {
+	        super(s);
+	  }
 	}
 
 }
