@@ -1,5 +1,6 @@
 # AskMeWeather
 2018华为杯自然语言分析比赛项目
+![](https://github.com/mutsuo/AskMeWeather/blob/master/preview.JPG)
 ## 功能
 本项目名为“知天气”（Ask Me Weather），为可提供气象信息的天气聊天机器人，是一款应用了自然语言分析技术构建的、基于Windows系统的桌面软件。本项目拥有符合当下流行的聊天界面，通过这个界面，可以与机器人“小智”进行轻松的对话，并以对话的形式，获取到所需要的天气信息。
 
